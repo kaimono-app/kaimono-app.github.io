@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Connexion à kaimono</title>
+<meta name="description" content="Connexion à kaimono.">
+<meta name="theme-color" content="#F3EEE3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151412" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/icon.png">
+<link rel="apple-touch-icon" href="../assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="../"><span class="seal" aria-hidden="true">買</span>kaimono</a>
+</header>
+<main class="doc">
+
+<div class="join">
+  <h1>Connexion à kaimono</h1>
+  <p>Ouverture de l’app…</p>
+  <a class="cta" id="open" href="kaimono://">Ouvrir kaimono</a>
+  <p class="small">Ouvrez ce lien sur le téléphone où kaimono est installé. Il ne sert qu’une fois et expire au bout d’une heure.</p>
+</div>
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var hash = q.get('token_hash');
+    var type = q.get('type');
+    if (!hash || !type) return;
+    var url = 'kaimono://auth?token_hash=' + encodeURIComponent(hash) + '&type=' + encodeURIComponent(type);
+    document.getElementById('open').href = url;
+    location.href = url;
+  })();
+</script>
+
+</main>
+<footer class="foot">
+  <a href="../confidentialite/">Confidentialité</a>
+  <a href="../cgu/">Conditions d’utilisation</a>
+  <a href="../assistance/">Assistance</a>
+  <span>Sans pub, données hébergées à Paris.</span>
+</footer>
+</body>
+</html>
