@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Une recette partagée sur kaimono</title>
+<meta name="description" content="Une recette partagée depuis kaimono, la liste de courses partagée.">
+<meta name="theme-color" content="#F3EEE3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151412" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/icon.png">
+<link rel="apple-touch-icon" href="../assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="../"><span class="seal" aria-hidden="true">買</span>kaimono</a>
+</header>
+<main class="doc">
+
+<div class="recipe" id="recipe" hidden>
+  <p class="from" id="from" hidden></p>
+  <h1 id="name"></h1>
+  <p class="meta" id="meta"></p>
+  <ul class="ingredients" id="items"></ul>
+  <p id="source-wrap" hidden><a id="source" rel="noopener nofollow">Voir la recette d’origine</a></p>
+  <div id="steps-wrap" hidden><h2>Étapes</h2><ol class="steps" id="steps"></ol></div>
+  <div class="add">
+    <a class="cta" id="open" href="kaimono://">Ajouter dans kaimono</a>
+    <p class="small">Pas encore l’app ? <a href="https://apps.apple.com/fr/app/kaimono-liste-de-courses/id6818076246">Téléchargez-la sur l’App Store</a>, puis touchez à nouveau ce lien. Ses ingrédients partiront dans votre liste de courses, rangés par rayon.</p>
+  </div>
+</div>
+<div class="join" id="missing" hidden>
+  <h1>Recette introuvable</h1>
+  <p class="small">Ce lien ne correspond à aucune recette partagée. Demandez-en un nouveau.</p>
+</div>
+<script>
+  (function () {
+    var m = location.search.match(/[?&]r=([A-Za-z0-9]{8})/);
+    var $ = function (id) { return document.getElementById(id); };
+    if (!m) { $('missing').hidden = false; return; }
+    var code = m[1].toUpperCase();
+    $('open').href = 'kaimono://recipe/' + code;
+    fetch('https://krgayouktkkhvypfhrxa.supabase.co/rest/v1/rpc/shared_recipe', {
+      method: 'POST',
+      headers: { apikey: 'sb_publishable_BnDt1zC8FGDVxzdSAmOJmw_tIliD_CV', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_code: code })
+    }).then(function (r) { return r.json(); }).then(function (r) {
+      if (!r || !r.name) { $('missing').hidden = false; return; }
+      document.title = r.name + ' · kaimono';
+      $('name').textContent = r.name;
+      if (r.from) { $('from').textContent = r.from + ' vous partage sa recette'; $('from').hidden = false; }
+      var n = (r.items || []).length;
+      $('meta').textContent = n + ' ingrédient' + (n > 1 ? 's' : '') + (r.servings ? ' · pour ' + r.servings : '');
+      (r.items || []).forEach(function (i) {
+        var li = document.createElement('li');
+        var q = i.qty != null ? String(i.qty).replace('.', ',') + (i.unit ? ' ' + i.unit : '') : '';
+        var name = document.createElement('span'); name.textContent = i.name + (i.note ? ' (' + i.note + ')' : '');
+        li.appendChild(name);
+        if (q) { var qs = document.createElement('span'); qs.className = 'qty'; qs.textContent = q; li.appendChild(qs); }
+        $('items').appendChild(li);
+      });
+      if (r.sourceUrl && /^https?:\/\//.test(r.sourceUrl)) {
+        $('source').href = r.sourceUrl;
+        $('source').textContent = 'Voir la recette sur ' + r.sourceUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+        $('source-wrap').hidden = false;
+      }
+      (r.steps || []).forEach(function (t) { var li = document.createElement('li'); li.textContent = t; $('steps').appendChild(li); });
+      if ((r.steps || []).length) $('steps-wrap').hidden = false;
+      $('recipe').hidden = false;
+    }).catch(function () { $('missing').hidden = false; });
+  })();
+</script>
+
+</main>
+<footer class="foot">
+  <a href="../confidentialite/">Confidentialité</a>
+  <a href="../cgu/">Conditions d’utilisation</a>
+  <a href="../assistance/">Assistance</a>
+  <span>Données hébergées à Paris.</span>
+</footer>
+</body>
+</html>
